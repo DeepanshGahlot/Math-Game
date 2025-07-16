@@ -1,18 +1,26 @@
+
+
+
+# github link to the whole project with assets 
+# https://github.com/DeepanshGahlot/Math-Game
+
+#Student name - Deepansh Gahlot 
+#School - N.K Bagrodia Global School
+
+
+
 import pygame
 import random
 import math
 import time
 import os
 import json 
-# Initialize Pygame
 pygame.init()
 
-# Constants
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700
 FPS = 60
 
-# Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -42,8 +50,7 @@ class Particle:
         self.x += self.speed_x
         self.y += self.speed_y
         self.life -= 1
-        self.speed_y += 0.2  # Gravity
-        
+        self.speed_y += 0.2 
     def draw(self, screen):
         if self.life > 0:
             alpha = int(255 * (self.life / self.max_life))
@@ -56,11 +63,9 @@ class NinjaNumberSlashGame:
         pygame.display.set_caption("🥷 Ninja Number Slash 🥷")
         self.clock = pygame.time.Clock()
         
-        # Load assets
         self.load_assets()
         
-        # Game state
-        self.game_state = "menu"  # menu, instructions, game, game_over
+        self.game_state = "menu" 
         self.score = 0
         
         with open("high_score.json", "r") as f:
@@ -74,32 +79,28 @@ class NinjaNumberSlashGame:
         self.current_property = ""
         self.current_number = 0
         
-        # Timing
         self.level_start_time = 0
         self.question_start_time = 0
         self.time_per_question = 5
         
-        # Visual effects
         self.particles = []
         self.slash_animation = 0
         self.number_scale = 1.0
         self.background_color = DARK_BLUE
         self.flash_color = None
         self.flash_timer = 0
-        self.bg_alpha = 180  # For background transparency overlay
+        self.bg_alpha = 180 
         
-        # Button positions
         self.slash_button = pygame.Rect(200, 500, 200, 80)
         self.dodge_button = pygame.Rect(600, 500, 200, 80)
         
-        # Menu buttons
         self.start_button = pygame.Rect(350, 300, 300, 60)
         self.instructions_button = pygame.Rect(350, 380, 300, 60)
         self.quit_button = pygame.Rect(350, 460, 300, 60)
         
     def load_assets(self):
         """Load background image and fonts with error handling"""
-        # Load background image
+       
         try:
             self.bg_image = pygame.image.load("assets/ninja bg.jpg")
             self.bg_image = pygame.transform.scale(self.bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -108,7 +109,6 @@ class NinjaNumberSlashGame:
             print("⚠ Background image not found, using gradient background")
             self.bg_image = None
             
-        # Load custom font
         try:
             font_path = "assets/Tanji-Wp9rn.otf"
             self.ninja_font_big = pygame.font.Font(font_path, 72)
@@ -123,25 +123,21 @@ class NinjaNumberSlashGame:
             self.ninja_font_small = pygame.font.Font(None, 32)
             self.ninja_font_tiny = pygame.font.Font(None, 24)
             
-        # Set up font hierarchy
         self.big_font = self.ninja_font_big
         self.medium_font = self.ninja_font_medium
         self.small_font = self.ninja_font_small
         self.tiny_font = self.ninja_font_tiny
         
     def draw_background(self, overlay_alpha=100):
-        """Draw background with optional overlay for better text readability"""
         if self.bg_image:
             self.screen.blit(self.bg_image, (0, 0))
             
-            # Add semi-transparent overlay for better text visibility
             if overlay_alpha > 0:
                 overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
                 overlay.set_alpha(overlay_alpha)
                 overlay.fill(BLACK)
                 self.screen.blit(overlay, (0, 0))
         else:
-            # Fallback gradient background
             for i in range(SCREEN_HEIGHT):
                 color_value = int(50 + (i / SCREEN_HEIGHT) * 100)
                 color = (0, 0, color_value)
@@ -219,11 +215,9 @@ class NinjaNumberSlashGame:
             self.particles.append(Particle(x, y, color, speed_x, speed_y))
             
     def draw_ninja(self, x, y, size=50):
-        # Ninja body with glow effect
         pygame.draw.circle(self.screen, (30, 30, 30), (x, y), size + 3)
         pygame.draw.circle(self.screen, BLACK, (x, y), size)
         
-        # Ninja eyes with glow
         pygame.draw.circle(self.screen, (200, 200, 255), (x-15, y-10), 10)
         pygame.draw.circle(self.screen, WHITE, (x-15, y-10), 8)
         pygame.draw.circle(self.screen, (200, 200, 255), (x+15, y-10), 10)
@@ -231,13 +225,11 @@ class NinjaNumberSlashGame:
         pygame.draw.circle(self.screen, BLACK, (x-15, y-10), 4)
         pygame.draw.circle(self.screen, BLACK, (x+15, y-10), 4)
         
-        # Ninja sword with enhanced effects
         if self.slash_animation > 0:
             sword_length = 40 + self.slash_animation * 2
             sword_end_x = x + sword_length
             sword_end_y = y - 20
             
-            # Sword trail effect
             for i in range(5):
                 trail_alpha = 255 - (i * 50)
                 trail_x = x + 20 + (i * 5)
@@ -245,14 +237,13 @@ class NinjaNumberSlashGame:
                 pygame.draw.line(self.screen, (192, 192, 192, trail_alpha), 
                                (trail_x, trail_y), (sword_end_x - i*3, sword_end_y + i*2), 2)
                 
-            # Main sword
             pygame.draw.line(self.screen, SILVER, (x+20, y-10), (sword_end_x, sword_end_y), 4)
             pygame.draw.line(self.screen, WHITE, (x+20, y-10), (sword_end_x, sword_end_y), 2)
             pygame.draw.circle(self.screen, GOLD, (x+20, y-10), 6)
             pygame.draw.circle(self.screen, YELLOW, (x+20, y-10), 4)
             
     def draw_button(self, rect, text, color, text_color=WHITE, glow=False):
-        # Enhanced button with glow effect
+
         if glow:
             glow_rect = pygame.Rect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6)
             pygame.draw.rect(self.screen, (min(255, color[0] + 50), min(255, color[1] + 50), min(255, color[2] + 50)), glow_rect)
@@ -265,36 +256,28 @@ class NinjaNumberSlashGame:
         self.screen.blit(text_surface, text_rect)
         
     def draw_text_with_shadow(self, text, font, color, x, y, shadow_color=(0, 0, 0), shadow_offset=2):
-        """Draw text with shadow effect"""
-        # Draw shadow
+ 
         shadow_surface = font.render(text, True, shadow_color)
         shadow_rect = shadow_surface.get_rect(center=(x + shadow_offset, y + shadow_offset))
         self.screen.blit(shadow_surface, shadow_rect)
         
-        # Draw main text
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect(center=(x, y))
         self.screen.blit(text_surface, text_rect)
         
     def draw_menu(self):
-        # Draw background
         self.draw_background(overlay_alpha=80)
         
-        # Title with enhanced effects
         self.draw_text_with_shadow("🥷 NINJA NUMBER SLASH 🥷", self.big_font, GOLD, 
                                   SCREEN_WIDTH//2, 150, shadow_offset=3)
         
-        # Subtitle
         self.draw_text_with_shadow("Master the Art of Mathematical Combat", self.medium_font, WHITE, 
                                   SCREEN_WIDTH//2, 200)
-        # High score with glow effect
         self.draw_text_with_shadow(f"High Score: {self.high_score}", self.small_font, YELLOW, 
                                   SCREEN_WIDTH//2, 250)
         
-        # Draw ninja
         self.draw_ninja(SCREEN_WIDTH//2, 600, 60)
         
-        # Buttons with hover effects
         mouse_pos = pygame.mouse.get_pos()
         
         start_glow = self.start_button.collidepoint(mouse_pos)
@@ -345,14 +328,12 @@ class NinjaNumberSlashGame:
                 color = WHITE
                 
             text_surface = self.small_font.render(line, True, color)
-            # Add shadow for better readability
             shadow_surface = self.small_font.render(line, True, BLACK)
             self.screen.blit(shadow_surface, (52, y_offset + 2))
             self.screen.blit(text_surface, (50, y_offset))
             y_offset += 25
             
     def draw_game(self):
-        # Background with flash effect
         if self.flash_color and self.flash_timer > 0:
             self.draw_background(overlay_alpha=50)
             flash_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -362,35 +343,29 @@ class NinjaNumberSlashGame:
         else:
             self.draw_background(overlay_alpha=100)
         
-        # Draw particles
         for particle in self.particles[:]:
             particle.update()
             particle.draw(self.screen)
             if particle.life <= 0:
                 self.particles.remove(particle)
                 
-        # HUD with shadows
         self.draw_text_with_shadow(f"Score: {self.score}", self.medium_font, WHITE, 120, 35)
         self.draw_text_with_shadow(f"Level: {self.level}", self.medium_font, WHITE, 120, 75)
         
         accuracy = (self.correct_answers / max(1, self.total_questions)) * 100
         self.draw_text_with_shadow(f"Accuracy: {accuracy:.1f}%", self.small_font, WHITE, 120, 115)
         
-        # Time remaining
         time_left = self.time_limit - (time.time() - self.level_start_time)
         time_color = RED if time_left < 5 else WHITE
         self.draw_text_with_shadow(f"Time: {max(0, time_left):.1f}s", self.medium_font, time_color, 
                                   SCREEN_WIDTH-120, 35)
         
-        # Current target
         self.draw_text_with_shadow(f"TARGET: {self.get_property_description(self.current_property)}", 
                                   self.medium_font, YELLOW, SCREEN_WIDTH//2, 150, shadow_offset=3)
         
-        # Current number (with scale animation and glow)
         number_size = int(120 * self.number_scale)
         number_font = pygame.font.Font(None, number_size)
         
-        # Number glow effect
         for offset in range(5, 0, -1):
             glow_alpha = 50 - (offset * 10)
             glow_color = (255, 255, 255, glow_alpha)
@@ -398,15 +373,12 @@ class NinjaNumberSlashGame:
             glow_rect = glow_text.get_rect(center=(SCREEN_WIDTH//2 + offset, 300 + offset))
             self.screen.blit(glow_text, glow_rect)
             
-        # Main number
         self.draw_text_with_shadow(str(self.current_number), number_font, WHITE, 
                                   SCREEN_WIDTH//2, 300, shadow_offset=4)
         
-        # Question
         self.draw_text_with_shadow(f"Is {self.current_number} a {self.current_property.replace('_', ' ')}?", 
                                   self.medium_font, WHITE, SCREEN_WIDTH//2, 400)
         
-        # Enhanced buttons
         mouse_pos = pygame.mouse.get_pos()
         slash_glow = self.slash_button.collidepoint(mouse_pos)
         dodge_glow = self.dodge_button.collidepoint(mouse_pos)
@@ -414,15 +386,12 @@ class NinjaNumberSlashGame:
         self.draw_button(self.slash_button, "SLASH", GREEN, glow=slash_glow)
         self.draw_button(self.dodge_button, "DODGE", RED, glow=dodge_glow)
         
-        # Draw ninja
         ninja_x = 100 if self.slash_animation == 0 else 150
         self.draw_ninja(ninja_x, 550)
         
-        # Instructions
         self.draw_text_with_shadow("SPACE = Slash | D = Dodge", self.small_font, SILVER, 
                                   SCREEN_WIDTH//2, 620)
         
-        # Update animations
         if self.slash_animation > 0:
             self.slash_animation -= 1
             
@@ -439,11 +408,9 @@ class NinjaNumberSlashGame:
     def draw_game_over(self):
         self.draw_background(overlay_alpha=120)
         
-        # Game over title
         self.draw_text_with_shadow("MISSION COMPLETE!", self.big_font, GOLD, 
                                   SCREEN_WIDTH//2, 150, shadow_offset=4)
         
-        # Final stats
         stats = [
             f"Final Score: {self.score}",
             f"Questions Answered: {self.total_questions}",
@@ -451,7 +418,6 @@ class NinjaNumberSlashGame:
             f"Accuracy: {(self.correct_answers/max(1, self.total_questions))*100:.1f}%"
         ]
         
-        # Ninja rank
         if self.score >= 300:
             rank = "🥇 MASTER NINJA"
             rank_color = GOLD
@@ -470,17 +436,14 @@ class NinjaNumberSlashGame:
             self.draw_text_with_shadow(stat, self.medium_font, WHITE, SCREEN_WIDTH//2, y_offset)
             y_offset += 50
             
-        # Rank
         self.draw_text_with_shadow(rank, self.big_font, rank_color, SCREEN_WIDTH//2, y_offset + 50, 
                                   shadow_offset=3)
         
-        # New high score
         if self.score > self.high_score:
             
             self.draw_text_with_shadow("🎉 NEW HIGH SCORE! 🎉", self.medium_font, YELLOW, 
                                       SCREEN_WIDTH//2, y_offset + 120, shadow_offset=2)
             
-        # Return instruction
         self.draw_text_with_shadow("Press SPACE to return to menu", self.small_font, WHITE, 
                                   SCREEN_WIDTH//2, SCREEN_HEIGHT - 50)
         
@@ -592,7 +555,6 @@ class NinjaNumberSlashGame:
                             
                         self.game_state = "game_over"
                         
-            # Draw everything
             if self.game_state == "menu":
                 self.draw_menu()
             elif self.game_state == "instructions":
@@ -608,5 +570,8 @@ class NinjaNumberSlashGame:
         pygame.quit()
 
 if __name__ == "__main__":
-    game = NinjaNumberSlashGame()
-    game.run()
+    try:
+        game = NinjaNumberSlashGame()
+        game.run()
+    except:
+        print("Please Download whole project from the github link given above")
